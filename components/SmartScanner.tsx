@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { User, Expense, ExpenseCategory, ExpenseStatus } from '../types';
 import { extractExpenseFromImageOrPDF, blobToBase64 } from '../services/geminiService';
 import { Upload, FileText, Loader2, CheckCircle, AlertCircle, ScanLine, Save, X, RefreshCw } from 'lucide-react';
@@ -31,6 +31,20 @@ export const SmartScanner: React.FC<SmartScannerProps> = ({ currentUser, onAddEx
     return `${year}-${month}-${day}`;
   };
 
+  // Effect to handle preview URL creation and cleanup
+  useEffect(() => {
+    if (!selectedFile) {
+      setPreviewUrl(null);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(selectedFile);
+    setPreviewUrl(objectUrl);
+
+    // Cleanup function to avoid memory leaks
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [selectedFile]);
+
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -44,10 +58,6 @@ export const SmartScanner: React.FC<SmartScannerProps> = ({ currentUser, onAddEx
       setSelectedFile(file);
       setError(null);
       setScannedData(null);
-
-      // Create preview URL
-      const objectUrl = URL.createObjectURL(file);
-      setPreviewUrl(objectUrl);
 
       // Auto-start scanning
       await scanDocument(file);
@@ -103,7 +113,6 @@ export const SmartScanner: React.FC<SmartScannerProps> = ({ currentUser, onAddEx
 
   const reset = () => {
     setSelectedFile(null);
-    setPreviewUrl(null);
     setScannedData(null);
     setError(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -161,13 +170,13 @@ export const SmartScanner: React.FC<SmartScannerProps> = ({ currentUser, onAddEx
                  <img 
                    src={previewUrl || ''} 
                    alt="Preview" 
-                   className="max-w-full max-h-[400px] object-contain rounded shadow-md" 
+                   className="w-full h-auto max-h-[400px] object-contain rounded shadow-md" 
                  />
                )}
                
                <button 
                  onClick={reset}
-                 className="absolute top-2 right-2 p-2 bg-white/80 hover:bg-white text-slate-600 rounded-full shadow-sm backdrop-blur-sm"
+                 className="absolute top-2 right-2 p-2 bg-white/80 hover:bg-white text-slate-600 rounded-full shadow-sm backdrop-blur-sm z-10"
                  title="Remover arquivo"
                >
                  <X size={20} />

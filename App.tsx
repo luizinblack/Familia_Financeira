@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { Dashboard } from './components/Dashboard';
 import { ExpenseList } from './components/ExpenseList';
 import { ExpenseForm } from './components/ExpenseForm';
+import { SmartScanner } from './components/SmartScanner';
 import { Reports } from './components/Reports';
 import { AdminPanel } from './components/AdminPanel';
 import { Profile } from './components/Profile';
@@ -172,6 +173,7 @@ const App: React.FC = () => {
         {activeTab === 'advanced_history' && <AdvancedHistory expenses={expenses} users={users} />}
         {activeTab === 'reports' && <Reports expenses={expenses} users={users} onUpdateStatus={handleUpdateStatus} />}
         {activeTab === 'new' && <ExpenseForm currentUser={currentUser} onAddExpense={handleAddExpense} onCancel={() => setActiveTab('expenses')} />}
+        {activeTab === 'scanner' && <SmartScanner currentUser={currentUser} onAddExpense={handleAddExpense} onCancel={() => setActiveTab('expenses')} />}
         {activeTab === 'profile' && <Profile user={currentUser} onUpdate={handleUpdateUser} onDeleteAllExpenses={handleDeleteAllExpenses} />}
         {activeTab === 'subscription' && <Subscription user={currentUser} onStartCheckout={() => setIsCheckout(true)} />}
         {activeTab === 'admin' && currentUser.role === UserRole.ADMIN && <AdminPanel onRegisterUser={handleRegister} />}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { User, UserRole } from '../types';
-import { LayoutDashboard, PlusCircle, List, LogOut, PieChart, Shield, User as UserIcon, ClipboardList, UserCog, CheckCircle, Crown, LockKeyhole, FolderArchive } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, List, LogOut, PieChart, Shield, User as UserIcon, ClipboardList, UserCog, CheckCircle, Crown, LockKeyhole, FolderArchive, ScanLine } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,6 +14,7 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children, user, activeTab, onTabChange, onLogout, notification }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'scanner', label: 'Importar (IA)', icon: ScanLine },
     { id: 'expenses', label: 'Lançamentos', icon: List },
     { id: 'advanced_history', label: 'Exportar & Histórico', icon: FolderArchive },
     { id: 'reports', label: 'Relatórios', icon: ClipboardList },
@@ -84,3 +85,52 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, activeTab, onTab
               onClick={() => onTabChange(item.id)}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                 activeTab === item.id
+                  ? (item.id === 'system_admin' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-emerald-600 text-white shadow-lg')
+                  : item.id === 'subscription' && user.plan !== 'premium' 
+                    ? 'text-amber-300 hover:bg-slate-800 hover:text-amber-200' 
+                    : item.id === 'system_admin'
+                      ? 'text-indigo-300 hover:bg-slate-800 hover:text-indigo-200'
+                      : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+              }`}
+            >
+              <item.icon size={20} className={item.id === 'subscription' && user.plan === 'premium' ? 'text-amber-400' : ''} />
+              <span className="font-medium text-sm">{item.label}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div className="p-4 border-t border-slate-700">
+          <button
+            onClick={onLogout}
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-400 hover:bg-slate-800 hover:text-red-300 transition-colors"
+          >
+            <LogOut size={20} />
+            <span>Sair</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto h-screen p-4 md:p-8 relative">
+        <div className="max-w-7xl mx-auto">
+          {children}
+        </div>
+
+        {/* Global Notification Toast */}
+        {notification && (
+          <div className="fixed top-6 right-6 z-50 animate-in slide-in-from-right-10 fade-in duration-300">
+            <div className="bg-emerald-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3 border-l-4 border-emerald-300">
+              <div className="bg-white/20 p-1.5 rounded-full">
+                <CheckCircle size={20} className="text-white" />
+              </div>
+              <div>
+                <p className="font-bold text-sm">Sucesso</p>
+                <p className="text-sm text-emerald-50">{notification}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
